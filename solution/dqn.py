@@ -25,8 +25,8 @@ from .utils import ReplayMemory
 # The policy in DQN is called an "epsilon-greedy" policy, which is that it
 # greedily chooses the best action w.r.t. current estimated Q-function, but
 # with a small epsilon chooses an action uniformly at random. This
-# randomness is to allow for exploration to compensate for that the
-# estimated Q-function is not very accurate early on.
+# randomness allows for exploration to compensate for that the estimated
+# Q-function is not very accurate early on.
 @torch.no_grad()
 def dqn_policy(q, state, epsilon=0.0, device="cpu"):
     # The PyTorch network usually operates on a batch, so we need to
@@ -79,6 +79,7 @@ def dqn(q: nn.Module, env: gym.core.Env,
         n_steps=1_000_000,
         eval_interval=10_000,
         device="cpu",
+        eval_env=None, # Manually provided evaluation env if it does not support deepcopy
         # Hyperparameters
         discount=0.99,
         exploration_rate=0.05,
@@ -91,6 +92,9 @@ def dqn(q: nn.Module, env: gym.core.Env,
     The Q function shall be represented as a PyTorch module that acts on 
     Q: [B, obsdim*] -> [B, n_actions]
     """
+
+    if eval_env is None:
+        eval_env = copy.deepcopy(env)
 
     # We use tensorboard to log and plot progress
     spec_id = "".join(c for c in env.spec.id.replace("/", "-").lower() if c in "-" or c.isalnum())
@@ -185,7 +189,7 @@ def dqn(q: nn.Module, env: gym.core.Env,
         # Evaluate the policy
         if step % eval_interval == 0:
             progress.set_postfix_str("Evaluating...")
-            eval_return = dqn_eval(q, copy.deepcopy(env), device=device)
+            eval_return = dqn_eval(q, eval_env, device=device)
             if best_return is None or eval_return >= best_return:
                 best_q = copy.deepcopy(q)
                 best_return = eval_return

@@ -9,6 +9,7 @@ import gymnasium as gym
 import torch
 import torch.nn as nn
 
+import solution
 from solution.dqn import dqn
 
 ENVS = {
@@ -18,7 +19,7 @@ ENVS = {
 }
 parser = argparse.ArgumentParser("Train a DQN policy on a specified environment")
 parser.add_argument("env", choices=ENVS.keys(), help="The environment to train on.")
-parser.add_argument("-d", "--device", type=str, default=None, help="The device to train on.")
+parser.add_argument("-d", "--device", dest="device", type=str, default=None, help="The device to train on.")
 args = parser.parse_args()
 
 MODEL_PREFIX = args.env
@@ -48,7 +49,7 @@ critic = nn.Sequential(
 
 def save_hook(model):
     return MODEL_PREFIX, {
-        "critic": model,
+        "critic": model.to("cpu"),
         "env_name": ENV_NAME,
         "env_kwargs": ENV_KWARGS,
     }

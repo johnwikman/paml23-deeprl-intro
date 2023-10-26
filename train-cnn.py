@@ -10,25 +10,43 @@ import torch
 import torch.nn as nn
 import torchvision
 
+import solution
 from solution.dqn import dqn
 from solution.modules import BytePixel2FloatPixel
 
 ENVS = {
-    "car": ("CarRacing-v2", {"continuous": False}, 1_000_000),
+    "atari-breakout": ("ALE/Breakout-v5", {}, [], 1_000_000),
+    "car": ("CarRacing-v2", {"continuous": False}, [], 1_000_000),
+    "flappybird": ("FlappyBird-v0", {"render_mode": "rgb_array"}, [(gym.wrappers.TimeLimit, {"max_episode_steps": 1000})], 1_000_000),
 }
 parser = argparse.ArgumentParser("Train a DQN policy on a specified environment")
 parser.add_argument("env", choices=ENVS.keys(), help="The environment to train on.")
-parser.add_argument("-d", "--device", type=str, default=None, help="The device to train on.")
+parser.add_argument("-d", "--device", dest="device", type=str, default=None, help="The device to train on.")
 args = parser.parse_args()
 
 MODEL_PREFIX = args.env
-ENV_NAME, ENV_KWARGS, N_STEPS = ENVS[args.env]
+ENV_NAME, ENV_KWARGS, ENV_WRAPPERS, N_STEPS = ENVS[args.env]
+
+# The environment setup here follows the architecture from the DQN paper. I.e.
+# We downsample the observations to a 84x84 grayscale image, then stack the
+# last 4 frames into a (4,84,84) tensor, which is then input to the
+# convolutional neural network (CNN). The CNN consists of two convolutional
+# layers separated by ReLU activations (see below).
+
+ENV_WRAPPERS += [
+    (gym.wrappers.ResizeObservation, {"shape": 84}),
+    (gym.wrappers.GrayScaleObservation, {}),
+    (gym.wrappers.FrameStack, {"num_stack": 4}),
+]
 
 print(f"Env: {ENV_NAME} (kwargs: {ENV_KWARGS})")
 env = gym.make(ENV_NAME, **ENV_KWARGS)
-env = gym.wrappers.ResizeObservation(env, 84)
-env = gym.wrappers.GrayScaleObservation(env)
-env = gym.wrappers.FrameStack(env, num_stack=4)
+for wrap, wrap_kwargs in ENV_WRAPPERS:
+    env = wrap(env, **wrap_kwargs)
+# Same for eval_env
+eval_env = gym.make(ENV_NAME, **ENV_KWARGS)
+for wrap, wrap_kwargs in ENV_WRAPPERS:
+    eval_env = wrap(eval_env, **wrap_kwargs)
 
 random.seed(0)
 np.random.seed(0)
@@ -63,19 +81,16 @@ critic = nn.Sequential(
 
 def save_hook(model):
     return MODEL_PREFIX, {
-        "critic": model,
+        "critic": model.to("cpu"),
         "env_name": ENV_NAME,
         "env_kwargs": ENV_KWARGS,
-        "wrappers": [
-            (gym.wrappers.ResizeObservation, {"shape": 84}),
-            (gym.wrappers.GrayScaleObservation, {}),
-            (gym.wrappers.FrameStack, {"num_stack": 4}),
-        ]
+        "wrappers": ENV_WRAPPERS,
     }
 
 
 output_critic = dqn(critic, env,
     save_hook=save_hook,
+    eval_env=eval_env,
     n_steps=N_STEPS,
     device=args.device,
     batch_size=128,

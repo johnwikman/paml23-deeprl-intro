@@ -3,8 +3,8 @@ channels:
   - conda-forge
   - pytorch
 dependencies:
-  - python>=3.10.0
-  - matplotlib
+  - python=3.10.12
+  - matplotlib=3.8.0
   - numpy
   - pip
   - pytorch>=2.0.0
@@ -16,3 +16,4 @@ dependencies:
   - swig
   - pip:
       - gymnasium[atari, box2d, other, accept-rom-license] == 0.28.*
+      - flappy-bird-env
