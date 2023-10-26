@@ -18,6 +18,7 @@ ENVS = {
 }
 parser = argparse.ArgumentParser("Train a DQN policy on a specified environment")
 parser.add_argument("env", choices=ENVS.keys(), help="The environment to train on.")
+parser.add_argument("-d", "--device", type=str, default=None, help="The device to train on.")
 args = parser.parse_args()
 
 MODEL_PREFIX = args.env
@@ -30,7 +31,8 @@ random.seed(0)
 np.random.seed(0)
 torch.manual_seed(0)
 
-device = "cuda" if torch.cuda.is_available() else "cpu"
+if args.device is None:
+    args.device = "cuda" if torch.cuda.is_available() else "cpu"
 
 obs_dim = env.observation_space.shape[0]
 n_actions = env.action_space.n
@@ -55,7 +57,7 @@ def save_hook(model):
 output_critic = dqn(critic, env,
     save_hook=save_hook,
     n_steps=N_STEPS,
-    device=device,
+    device=args.device,
     batch_size=64,
     replay_size=150_000,
     lr=1e-3,

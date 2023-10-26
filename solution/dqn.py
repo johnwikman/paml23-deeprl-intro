@@ -185,7 +185,7 @@ def dqn(q: nn.Module, env: gym.core.Env,
         # Evaluate the policy
         if step % eval_interval == 0:
             progress.set_postfix_str("Evaluating...")
-            eval_return = dqn_eval(q, copy.deepcopy(env))
+            eval_return = dqn_eval(q, copy.deepcopy(env), device=device)
             if best_return is None or eval_return >= best_return:
                 best_q = copy.deepcopy(q)
                 best_return = eval_return
