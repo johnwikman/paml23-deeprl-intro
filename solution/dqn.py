@@ -200,6 +200,7 @@ def dqn(q: nn.Module, env: gym.core.Env,
             os.makedirs(os.path.dirname(chkpath), exist_ok=True)
             with open(chkpath, "wb+") as f:
                 pickle.dump(blob, f)
+            q = q.to(device)
 
         # We also decay the exploration rate here
         exploration_rate *= 1.0 - exploration_decay
