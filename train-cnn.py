@@ -14,7 +14,7 @@ from solution.dqn import dqn
 from solution.modules import BytePixel2FloatPixel
 
 ENVS = {
-    "car": ("CarRacing-v2", {"continuous": False}, 300_000),
+    "car": ("CarRacing-v2", {"continuous": False}, 1_000_000),
 }
 parser = argparse.ArgumentParser("Train a DQN policy on a specified environment")
 parser.add_argument("env", choices=ENVS.keys(), help="The environment to train on.")
@@ -79,7 +79,8 @@ output_critic = dqn(critic, env,
     n_steps=N_STEPS,
     device=args.device,
     batch_size=128,
-    replay_size=20_000,
+    replay_size=100_000,
+    eval_interval=50_000,
     lr=1e-4,
     exploration_rate=1.0,
     exploration_decay=1e-5,

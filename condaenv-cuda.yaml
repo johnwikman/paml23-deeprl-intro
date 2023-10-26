@@ -1,0 +1,14 @@
+name: paml23cuda
+channels:
+  - conda-forge
+dependencies:
+  - python=3.10.12
+  - matplotlib=3.8.0
+  - numpy=1.26.0
+  - pip
+  - tensorboard=2.15.0
+  - tqdm=4.66.1
+  - rich=13.6.0
+  - swig=4.1.1
+  # pip3 install torch torchvision --index-url https://download.pytorch.org/whl/cu118
+  # pip3 install gymnasium[atari, box2d, other, accept-rom-license] == 0.28.*
