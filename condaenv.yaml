@@ -1,0 +1,18 @@
+name: paml23-deeprl-intro
+channels:
+  - conda-forge
+  - pytorch
+dependencies:
+  - python>=3.10.0
+  - matplotlib
+  - numpy
+  - pip
+  - pytorch>=2.0.0
+  - torchvision=0.15
+  - tensorboard=2.14
+  - tqdm
+  - rich
+  - pygame
+  - swig
+  - pip:
+      - gymnasium[atari, box2d, other, accept-rom-license] == 0.28.*
