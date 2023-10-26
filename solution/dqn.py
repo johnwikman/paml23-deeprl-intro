@@ -73,8 +73,8 @@ def dqn_eval(q: nn.Module, env: gym.core.Env, runs=10, device="cpu"):
     return total_return / runs
 
 
-def dqn(q: nn.Module, env: gym.core.Env,
-        save_hook,
+def dqn(q, env,
+        save_hook, prefix,
         # Training config
         n_steps=1_000_000,
         eval_interval=10_000,
@@ -93,8 +93,8 @@ def dqn(q: nn.Module, env: gym.core.Env,
     """
 
     # We use tensorboard to log and plot progress
-    spec_id = "".join(c for c in env.spec.id.replace("/", "-").lower() if c in "-" or c.isalnum())
-    writer_path = os.path.join("_tensorboard", datetime.now().strftime(f"dqn_{spec_id}_%Y%m%d_%H%M%S"))
+    spec_id = prefix #"".join(c for c in env.spec.id.replace("/", "-").lower() if c in "-" or c.isalnum())
+    writer_path = datetime.now().strftime(f"_tensorboard/dqn_{spec_id}_%Y%m%d_%H%M%S")
     print(f"Writing tensorboard logs to {writer_path}")
     writer = SummaryWriter(log_dir=writer_path)
 
@@ -164,11 +164,11 @@ def dqn(q: nn.Module, env: gym.core.Env,
             avg_eplen = sum(all_lengths) / len(all_lengths)
             avg_loss = sum(all_losses) / len(all_losses) if len(all_losses) > 0 else 0.0
             progress_postfix = " | ".join([
-                f"Ep {episode}",
-                f"Avg Return: {avg_return:.03f}",
-                f"Avg EpLen: {avg_eplen:.02f}",
-                f"Avg Loss: {avg_loss:.06f}",
-                f"Best Eval: {best_return}",
+                "Ep " + str(episode),
+                "Avg Return: " + str(avg_return),
+                "Avg EpLen: " + str(avg_eplen),
+                "Avg Loss: " + str(avg_loss),
+                "Best Eval: " + str(best_return),
             ])
             progress.set_postfix_str(progress_postfix)
 
@@ -185,14 +185,14 @@ def dqn(q: nn.Module, env: gym.core.Env,
         # Evaluate the policy
         if step % eval_interval == 0:
             progress.set_postfix_str("Evaluating...")
-            eval_return = dqn_eval(q, copy.deepcopy(env))
+            eval_return = dqn_eval(q, copy.deepcopy(env), device=device)
             if best_return is None or eval_return >= best_return:
                 best_q = copy.deepcopy(q)
                 best_return = eval_return
             progress.set_postfix_str(progress_postfix)
             # Save a checkpoint of the evaluated critic as well
             pfx, blob = save_hook(q)
-            chkpath = os.path.join("_checkpoints", f"{pfx}-{step:06d}.pkl")
+            chkpath = "_checkpoints/" + pfx + "-" + str(step) + ".pkl"
             os.makedirs(os.path.dirname(chkpath), exist_ok=True)
             with open(chkpath, "wb+") as f:
                 pickle.dump(blob, f)

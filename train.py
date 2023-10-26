@@ -51,9 +51,10 @@ def save_hook(model):
         "env_kwargs": ENV_KWARGS,
     }
 
+#dqn = torch.jit.script(dqn)
 
 output_critic = dqn(critic, env,
-    save_hook=save_hook,
+    save_hook=save_hook, prefix=MODEL_PREFIX,
     n_steps=N_STEPS,
     device=device,
     batch_size=64,
