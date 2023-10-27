@@ -15,9 +15,9 @@ from solution.dqn import dqn
 from solution.modules import BytePixel2FloatPixel
 
 ENVS = {
-    "atari-breakout": ("ALE/Breakout-v5", {}, [], 1_000_000),
+    "atari-breakout": ("ALE/Breakout-v5", {}, [], 2_000_000),
     "car": ("CarRacing-v2", {"continuous": False}, [], 1_000_000),
-    "flappybird": ("FlappyBird-v0", {"render_mode": "rgb_array"}, [(gym.wrappers.TimeLimit, {"max_episode_steps": 1000})], 1_000_000),
+    "flappybird": ("FlappyBird-v0", {"render_mode": "rgb_array"}, [(gym.wrappers.TimeLimit, {"max_episode_steps": 1000})], 2_000_000),
 }
 parser = argparse.ArgumentParser("Train a DQN policy on a specified environment")
 parser.add_argument("env", choices=ENVS.keys(), help="The environment to train on.")
@@ -93,12 +93,10 @@ output_critic = dqn(critic, env,
     eval_env=eval_env,
     n_steps=N_STEPS,
     device=args.device,
-    batch_size=128,
-    replay_size=100_000,
+    batch_size=256,
+    replay_size=500_000,
     eval_interval=50_000,
     lr=1e-4,
-    exploration_rate=1.0,
-    exploration_decay=1e-5,
 )
 
 print("Done")
