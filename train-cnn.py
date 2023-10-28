@@ -97,6 +97,9 @@ output_critic = dqn(critic, env,
     replay_size=500_000,
     eval_interval=50_000,
     lr=1e-4,
+    exploration_rate=1.0,
+    exploration_decay=1e-5,
+    exploration_min=0.05,
 )
 
 print("Done")

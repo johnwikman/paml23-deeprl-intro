@@ -82,6 +82,9 @@ def dqn(q: nn.Module, env: gym.core.Env,
         eval_env=None, # Manually provided evaluation env if it does not support deepcopy
         # Hyperparameters
         discount=0.99,
+        exploration_rate=0.05,
+        exploration_decay=0.0,
+        exploration_min=0.0,
         lr=1e-3,
         batch_size=128,
         replay_size=100_000,
@@ -148,7 +151,7 @@ def dqn(q: nn.Module, env: gym.core.Env,
     progress.set_postfix_str(progress_postfix)
     for step in progress:
 
-        a = dqn_policy(q, s, epsilon=(1.0 / (step+1)), device=device)
+        a = dqn_policy(q, s, epsilon=exploration_rate, device=device)
         s_next, r, terminated, truncated, _ = env.step(a)
 
         replay.add(s, a, r, s_next, terminated)
@@ -199,6 +202,9 @@ def dqn(q: nn.Module, env: gym.core.Env,
             with open(chkpath, "wb+") as f:
                 pickle.dump(blob, f)
             q = q.to(device)
+
+        # Decay exploration rate
+        exploration_rate = max(exploration_rate * exploration_decay, exploration_min)
 
         if len(replay) >= batch_size:
             bs, ba, br, bs_next, bterm = replay.sample(batch_size, device=device)
