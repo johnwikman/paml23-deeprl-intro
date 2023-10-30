@@ -15,5 +15,4 @@ dependencies:
   - pygame
   - swig
   - pip:
-      - gymnasium[atari, box2d, other, accept-rom-license] == 0.29.*
-      - flappy-bird-env
+      - gymnasium[atari, box2d, other, accept-rom-license] == 0.28.*

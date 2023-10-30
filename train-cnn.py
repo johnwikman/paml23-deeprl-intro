@@ -17,7 +17,6 @@ from solution.modules import BytePixel2FloatPixel
 ENVS = {
     "atari-breakout": ("ALE/Breakout-v5", {}, [], 2_000_000),
     "car": ("CarRacing-v2", {"continuous": False}, [], 1_000_000),
-    "flappybird": ("FlappyBird-v0", {"render_mode": "rgb_array"}, [(gym.wrappers.TimeLimit, {"max_episode_steps": 1000})], 2_000_000),
 }
 parser = argparse.ArgumentParser("Train a DQN policy on a specified environment")
 parser.add_argument("env", choices=ENVS.keys(), help="The environment to train on.")
@@ -27,11 +26,11 @@ args = parser.parse_args()
 MODEL_PREFIX = args.env
 ENV_NAME, ENV_KWARGS, ENV_WRAPPERS, N_STEPS = ENVS[args.env]
 
-# The environment setup here follows the architecture from the DQN paper. I.e.
-# We downsample the observations to a 84x84 grayscale image, then stack the
-# last 4 frames into a (4,84,84) tensor, which is then input to the
-# convolutional neural network (CNN). The CNN consists of two convolutional
-# layers separated by ReLU activations (see below).
+# The environment setup here follows the architecture from the DQN paper
+# (except for the cropping). I.e. we downsample the observations to a 84x84
+# grayscale image, then stack the last 4 frames into a (4,84,84) tensor, which
+# is then input to the convolutional neural network (CNN). The CNN consists of
+# two convolutional layers separated by ReLU activations (see below).
 
 ENV_WRAPPERS += [
     (gym.wrappers.ResizeObservation, {"shape": 84}),

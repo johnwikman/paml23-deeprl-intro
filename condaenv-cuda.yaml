@@ -12,4 +12,3 @@ dependencies:
   - swig=4.1.1
   # pip3 install torch torchvision --index-url https://download.pytorch.org/whl/cu118
   # pip3 install "gymnasium[atari, box2d, other, accept-rom-license] == 0.28.*"
-  # pip3 install flappy-bird-env
