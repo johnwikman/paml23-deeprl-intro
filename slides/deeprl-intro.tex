@@ -1,4 +1,4 @@
-\documentclass[aspectratio=1609,handout]{beamer}
+\documentclass[aspectratio=1609,ADDITIONAL_DOCCLASS_ARGS]{beamer}
 
 \usetheme[title style=centered, footerstyle=progress, tikzlines]{kth}
 \usefonttheme{kth}
@@ -29,17 +29,6 @@
 
 
 \frame[plain, t]{\titlepage}
-
-% Recap RL
-%  - State the problem agent/environment
-%  - What are we optimizing against, eager rewards?
-%  - Formulating this as the Q-function
-%  - Approximating Q-function with DQN
-% The tools
-%  - Gymnasium, datasets
-%  - PyTorch, the function approximator learning library
-%  - TensorBoard, logging of statistics
-%  - Demo time
 
 
 \begin{frame}{What to Expect}
@@ -146,10 +135,10 @@
   \item<2-> Substitute and subtract to get the approximation error:
         \begin{equation}
         err =
-        \mcolor{mathcolor1}{r + \gamma Q(s', \arg\max_{a'} Q_\theta(s', a'))}
+        \mcolor{mathcolor1}{r + \gamma Q_\theta(s', \arg\max_{a'} Q_\theta(s', a'))}
         - Q_\theta(s,a)
         \end{equation}
-  \item<3-> We denote $\mcolor{mathcolor1}{r + \gamma Q(s', \arg\max_{a'} Q_\theta(s', a'))}$ as the \tcolorbf{mathcolor1}{target} that $Q_\theta(s,a)$ should approximate.
+  \item<3-> We denote $\mcolor{mathcolor1}{r + \gamma Q_\theta(s', \arg\max_{a'} Q_\theta(s', a'))}$ as the \tcolorbf{mathcolor1}{target} that $Q_\theta(s,a)$ should approximate.
   \end{itemize}
 \end{frame}
 
@@ -189,7 +178,7 @@
         \begin{equation}
         \theta \leftarrow \theta -
         \alpha \nabla_\theta \mathbb{E}_{(s,a,r,s') \sim B}\left[\left(
-          \mcolor{mathcolor1}{r + \gamma Q(s', \arg\max_{a'} Q_{\bar{\theta}}(s', a'))}
+          \mcolor{mathcolor1}{r + \gamma Q_{\bar{\theta}}(s', \arg\max_{a'} Q_{\bar{\theta}}(s', a'))}
           - Q_\theta(s,a)
         \right)^2\right]
         \end{equation}

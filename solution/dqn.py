@@ -1,5 +1,5 @@
 """
-This contains a crude implementation of DQN which is primarily inteded for
+This contains a crude implementation of DQN which is primarily intended for
 educational purposes. Spinning Up and Stable Baselines provide more detailed
 and probably more efficient implementations.
 """
@@ -29,10 +29,9 @@ from .utils import ReplayMemory
 # Q-function is not very accurate early on.
 @torch.no_grad()
 def dqn_policy(q, state, epsilon=0.0, device="cpu"):
-    # The PyTorch network usually operates on a batch, so we need to
-    # unsqueeze out the batch dimension from the state before applying
-    # it to the network. Then we remove the batch dimension with
-    # squeeze.
+    # The PyTorch network usually operates on a batch, so we first need to
+    # unsqueeze the batch dimension from the state before applying it to the
+    # network. Then we remove the batch dimension from the output with squeeze.
     q.eval()
     qvals = q(torch.tensor(state, device=device).unsqueeze(0)).squeeze(0).cpu().numpy()
 
@@ -118,7 +117,7 @@ def dqn(q: nn.Module, env: gym.core.Env,
     #       ... etc
     #
     # But this ReplayMemory class avoids having to do concatenation and
-    # conversions to tensors when we want to apply the batched data to a
+    # conversions to tensors when we want to apply the batched data to our
     # network.
     replay = ReplayMemory(maxsize=replay_size, env=env)
 
@@ -215,7 +214,7 @@ def dqn(q: nn.Module, env: gym.core.Env,
 
             # Recall the definition of the Q-function that we want to learn:
             #
-            #            { r(s,a)                      if s is terminal state
+            #            { r(s,a)                      if s' is terminal state
             #   Q(s,a) = {
             #            { r(s,a) + γ * Q(s', π(s'))   otherwise
             #
